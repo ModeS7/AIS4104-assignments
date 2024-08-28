@@ -9,7 +9,7 @@ double deg_to_rad(double degrees)
 
 double rad_to_deg(double radians)
 {
-    return radians * 57.2958;
+    return radians * 57.2957795;
 }
 
 Eigen::Matrix3d rotate_x(double angle)
