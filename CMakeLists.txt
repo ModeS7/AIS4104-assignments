@@ -5,3 +5,4 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(test1)
 add_subdirectory(test2)
+add_subdirectory(assignment1)
