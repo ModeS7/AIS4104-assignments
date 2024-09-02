@@ -150,9 +150,11 @@ void transformation_matrix_test()
 void transform_vector()
 {
     Eigen::Matrix3d r = rotation_matrix_from_euler_zyx(Eigen::Vector3d{60, 45.0, 0.0});
-    Eigen::Vector3d v{2.5, 3.0, -10.0};
-    std::cout << "transformation_matrix: " << std::endl;
-    std::cout << transformation_matrix(r, v) << std::endl;
+    Eigen::Vector3d v{0.0, 0.0, 10.0};
+    Eigen::Vector4d v_a{2.5, 3.0, -10.0, 1.0};
+    Eigen::Vector4d W_cord = transformation_matrix(r, v) * v_a;
+    std::cout << "W_coordinates: " << std::endl;
+    std::cout << W_cord << std::endl;
 }
 
 int main()
