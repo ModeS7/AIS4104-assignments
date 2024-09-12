@@ -16,6 +16,13 @@ Eigen::Matrix3d math::skew_symmetric(Eigen::Vector3d v)
     return skew_matrix;
 }
 
+Eigen::Vector3d math::skew_symetric_to_vector(const Eigen::Matrix3d &m)
+{
+    Eigen::Vector3d v;
+    v << m(2, 1), m(0, 2), m(1, 0);
+    return v;
+}
+
 Eigen::Matrix3d rotation_matrix_from_frame_axes(const Eigen::Vector3d &x,
                                                 const Eigen::Vector3d &y,
                                                 const Eigen::Vector3d &z)

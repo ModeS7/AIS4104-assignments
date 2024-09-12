@@ -6,8 +6,12 @@
 
 namespace math{
     constexpr double deg_to_rad = EIGEN_PI / 180.0;
-    constexpr double rad_to_deg = 57.2957795;
+    constexpr double rad_to_deg = 180.0 / EIGEN_PI;
+    inline Eigen::Matrix3d I_3() {
+        return Eigen::Matrix3d::Identity();
+    }
     Eigen::Matrix3d skew_symmetric(Eigen::Vector3d v);
+    Eigen::Vector3d skew_symetric_to_vector(const Eigen::Matrix3d &m);
     Eigen::Matrix3d rotation_matrix_from_frame_axes(const Eigen::Vector3d &x,
                                                     const Eigen::Vector3d &y,
                                                     const Eigen::Vector3d &z);

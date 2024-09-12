@@ -114,13 +114,111 @@ void task2_b()
 Eigen::Matrix3d matrix_exponential(const Eigen::Vector3d &w, double theta)
 {
     Eigen::Matrix3d matrix;
-    double wx = math::skew_symmetric(w)(0,0);
-    double wy = math::skew_symmetric(w)(1,1);
-    double wz = math::skew_symmetric(w)(2,2);
-    double w_norm = w.norm();
-    matrix = Eigen::Matrix3d::Identity() + (std::sin(w_norm * theta) / w_norm) * math::skew_symmetric(w) + ((1 - std::cos(w_norm * theta)) / (w_norm * w_norm)) * math::skew_symmetric(w) * math::skew_symmetric(w);
+    double rad = theta * math::deg_to_rad;
+    Eigen::Matrix3d w_sk = math::skew_symmetric(w);
+    matrix = Eigen::Matrix3d::Identity() + w_sk * std::sin(rad) + w_sk * w_sk * (1 - std::cos(rad));
     return matrix;
 }
+
+// b)
+std::pair<Eigen::Vector3d, double> matrix_logarithm(const Eigen::Matrix3d &r)
+{
+    Eigen::Matrix3d w_sk;
+    double theta;
+    Eigen::Vector3d w;
+    if (r.isApprox(Eigen::Matrix3d::Identity(), 1e-6))
+    {
+        w_sk = Eigen::Matrix3d::Zero(); // w_sk should be returned as undefined ask Aleksander
+        std::cout << "w_sk is undefined" << std::endl;
+        theta = 0.0;
+    }
+    else if (r.trace() == -1)
+    {
+        Eigen::Vector3d w_ = Eigen::Vector3d(r(0, 2), r(1, 2), r(2, 2)+1);
+        w /= std::sqrt(2 * (1 + r(2, 2)));
+        theta = 180.0;
+    }
+    else
+    {
+        theta = std::acos((r.trace() - 1) / 2);
+        w_sk = r - r.transpose() / (2 * std::sin(theta * math::rad_to_deg));
+        w = math::skew_symetric_to_vector(w_sk);
+    }
+    return std::make_pair(w, theta);
+}
+
+// c)
+Eigen::Matrix4d matrix_exponential(const Eigen::Vector3d &w, const Eigen::Vector3d &v, double theta)
+{
+    Eigen::Matrix4d T;
+    double rad = theta * math::deg_to_rad;
+    if (w.norm() == 1)
+    {
+        Eigen::Matrix3d w_sk = math::skew_symmetric(w);
+        Eigen::Matrix3d ewt = matrix_exponential(w, theta);
+        Eigen::Matrix3d G = math::I_3() * rad + (1 - std::cos(rad)) * w_sk + (rad - std::sin(rad)) * w_sk * w_sk;
+        T.block<3, 3>(0, 0) = ewt;
+        T.block<3, 1>(0, 3) = G * v;
+        T.block<1, 3>(3, 0) = Eigen::Vector3d::Zero().transpose();
+        T(3, 3) = 1.0;
+    }
+    else if (v.norm() == 1 and w.norm() == 0) // w = 0 not sure what that means ask Aleksander
+    {
+        T.block<3, 3>(0, 0) = math::I_3();
+        T.block<3, 1>(0, 3) = v;
+        T.block<1, 3>(3, 0) = Eigen::Vector3d::Zero().transpose();
+        T(3, 3) = 1.0;
+    }
+    else
+    {
+        std::cout << "Invalid input" << std::endl;
+        return Eigen::Matrix4d::Zero();
+    }
+    return T;
+}
+
+// d)
+std::pair<Eigen::VectorXd, double> matrix_logarithm(const Eigen::Matrix4d &t)
+{
+    Eigen::Matrix3d R = t.block<3, 3>(0, 0);
+    Eigen::Vector3d p = t.block<3, 1>(0, 3);
+    Eigen::Vector3d w;
+    Eigen::Vector3d v;
+    double theta;
+    if (R.isApprox(math::I_3(), 1e-6))
+    {
+        w = Eigen::Vector3d::Zero();
+        v = p/p.norm();
+        theta = p.norm(); //not sure if i get this in deg or rad
+    }
+    else
+    {
+        std::pair<Eigen::Vector3d, double> m = matrix_logarithm(R);
+        w = m.first;
+        theta = m.second;
+        Eigen::Matrix3d w_sk = math::skew_symmetric(w);
+        double rad = theta * math::deg_to_rad;
+        Eigen::Matrix3d G_1 = math::I_3()/rad - w_sk / 2 + (1 / rad - cot(rad / 2) / 2) * w_sk * w_sk;
+        v = G_1 * p;
+        w = math::skew_symetric_to_vector(w_sk);
+    }
+    return std::make_pair(twist(w, v), theta);
+}
+
+//-----------------------------------------------------------------------------------------------
+// Task 4
+// a)
+void print_pose(const std::string &label, const Eigen::Matrix4d &tf)
+{
+    Eigen::Vector3d p = tf.block<3, 1>(0, 3);
+    Eigen::Matrix3d r = tf.block<3, 3>(0, 0);
+    Eigen::Vector3d e = euler_zyx_from_rotation(r);
+    std::cout << label << std::endl;
+    std::cout << "Euler ZYX: " << e.transpose() * math::rad_to_deg << std::endl;
+    std::cout << "Position: " << p.transpose() << std::endl;
+}
+
+
 
 
 
@@ -132,6 +230,23 @@ int main()
     std::cout << " E:" << e.transpose() * math::rad_to_deg << std::endl;
     std::cout << "Ea:" << ea.transpose() * math::rad_to_deg << std::endl;*/
     //task2_a();
-    task2_b();
+    //task2_b();
+    //print_pose("shit", Eigen::Matrix4d::Identity());
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
