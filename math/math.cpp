@@ -1,8 +1,10 @@
 #include <iostream>
 
 #include <Eigen/Dense>
+#include <cstring>
 
 #include "math/math.h"
+
 
 Eigen::Matrix3d math::skew_symmetric(Eigen::Vector3d v)
 {
@@ -12,15 +14,6 @@ Eigen::Matrix3d math::skew_symmetric(Eigen::Vector3d v)
             v(2), 0.0, -v(0),
             -v(1), v(0), 0.0;
     return skew_matrix;
-}
-
-void math::skew_symmetric_test()
-{
-    Eigen::Matrix3d skew_matrix = math::skew_symmetric(Eigen::Vector3d{0.5, 0.5, 0.707107});
-    std::cout << "Skew-symmetric matrix: " << std::endl;
-    std::cout << skew_matrix << std::endl;
-    std::cout << "Skew-symmetric matrix transposition: " << std::endl;
-    std::cout << -skew_matrix.transpose() << std::endl;
 }
 
 Eigen::Matrix3d rotation_matrix_from_frame_axes(const Eigen::Vector3d &x,
@@ -73,11 +66,28 @@ Eigen::Matrix3d math::rotation_matrix_from_axis_angle(const Eigen::Vector3d &axi
     return matrix;
 }
 
-Eigen::Matrix3d math::rotation_matrix_from_euler_zyx(const Eigen::Vector3d &e)
+Eigen::Matrix3d math::rotation_matrix_from_euler(const char *s, const Eigen::Vector3d &e)
 {
     Eigen::Matrix3d matrix;
     Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
-    matrix = I * math::rotate_z(e(0)) * math::rotate_y(e(1)) * math::rotate_x(e(2));
+    if(std::strcmp(s, "zyx") == 0) {
+        matrix = I * math::rotate_z(e(0)) * math::rotate_y(e(1)) * math::rotate_x(e(2));
+    }
+    else if(std::strcmp(s, "yzx") == 0) {
+        matrix = I * math::rotate_y(e(0)) * math::rotate_z(e(1)) * math::rotate_x(e(2));
+    }
+    else if(std::strcmp(s, "xzy") == 0) {
+        matrix = I * math::rotate_x(e(0)) * math::rotate_z(e(1)) * math::rotate_y(e(2));
+    }
+    else if(std::strcmp(s, "xyz") == 0) {
+        matrix = I * math::rotate_x(e(0)) * math::rotate_y(e(1)) * math::rotate_z(e(2));
+    }
+    else if(std::strcmp(s, "yxz") == 0) {
+        matrix = I * math::rotate_y(e(0)) * math::rotate_x(e(1)) * math::rotate_z(e(2));
+    }
+    else if(std::strcmp(s, "zxy") == 0) {
+        matrix = I * math::rotate_z(e(0)) * math::rotate_x(e(1)) * math::rotate_y(e(2));
+    }
     return matrix;
 }
 
