@@ -218,8 +218,36 @@ void print_pose(const std::string &label, const Eigen::Matrix4d &tf)
     std::cout << "Position: " << p.transpose() << std::endl;
 }
 
+// b)
+Eigen::Matrix4d planar_3r_fk_transform(const std::vector<double> &joint_positions)
+{
+    double L1 = 10.0, L2 = 10.0, L3 = 10.0;
+    Eigen::Matrix4d t01;
+    t01.block<3, 3>(0, 0) = math::rotate_z(joint_positions[0] * math::deg_to_rad);
+    t01.block<3, 1>(0, 3) = Eigen::Vector3d(0.0, 0.0, 0.0);
+    t01.block<1, 3>(3, 0) = Eigen::Vector3d::Zero().transpose();
+    t01(3, 3) = 1.0;
+    Eigen::Matrix4d t12;
+    t12.block<3, 3>(0, 0) = math::rotate_z(joint_positions[1] * math::deg_to_rad);
+    t12.block<3, 1>(0, 3) = Eigen::Vector3d(L1, 0.0, 0.0);
+    t12.block<1, 3>(3, 0) = Eigen::Vector3d::Zero().transpose();
+    t12(3, 3) = 1.0;
+    Eigen::Matrix4d t23;
+    t23.block<3, 3>(0, 0) = math::rotate_z(joint_positions[2] * math::deg_to_rad);
+    t23.block<3, 1>(0, 3) = Eigen::Vector3d(L2, 0.0, 0.0);
+    t23.block<1, 3>(3, 0) = Eigen::Vector3d::Zero().transpose();
+    t23(3, 3) = 1.0;
+    Eigen::Matrix4d t34 = Eigen::Matrix4d::Identity();
+    t34.block<3, 1>(0, 3) = Eigen::Vector3d(L3, 0.0, 0.0);
+    return t01 * t12 * t23 * t34;
+}
 
+// c)
+Eigen::Matrix4d planar_3r_fk_screw(const std::vector<double> &joint_positions)
+{
+    double L1 = 10.0, L2 = 10.0, L3 = 10.0;
 
+}
 
 
 int main()
@@ -232,6 +260,10 @@ int main()
     //task2_a();
     //task2_b();
     //print_pose("shit", Eigen::Matrix4d::Identity());
+    //task4b
+    /*std::vector<double> joint_positions = {10.0, -15.0, 2.75};
+    Eigen::Matrix4d transform = planar_3r_fk_transform(joint_positions);
+    print_pose("end position:", transform);*/
     return 0;
 }
 
