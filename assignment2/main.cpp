@@ -390,7 +390,11 @@ int main()
     print_pose("end position transform:", transform);
     print_pose("end position screw", screw);*/
     //task5a
-    std::vector<double> joint_positions = {30.0, -60.0, 30.0, -50.0, 90.0, 0.0};
+    std::vector<double> joint_positions = {30.0, -60.0, 30.0, -50.0, 90.0, 0.0};  //-286, -317, 545
+    //std::vector<double> joint_positions = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};  //-457,  -223,  67
+    //std::vector<double> joint_positions = {0.0, 0.0, 0.0, -90.0, 0.0, 0.0};  //-542, -223, 152
+    //std::vector<double> joint_positions = {0.0, 180.0, 0.0, 0.0, 0.0, 0.0};  //456, -223, 236
+    //std::vector<double> joint_positions = {0.0, -90.0, 0.0, 0.0, 0.0, 0.0};  //-85, -223, 608
     Eigen::Matrix4d screw_ur3e = ur3e_fk_screw(joint_positions);
     Eigen::Matrix4d transform_ur3e = ur3e_fk_transform(joint_positions);
     print_pose("end position screw ur3e:", screw_ur3e);
