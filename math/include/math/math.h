@@ -22,6 +22,9 @@ namespace math{
     Eigen::Matrix3d rotation_matrix_from_euler(const char *s, const Eigen::Vector3d &e);
     Eigen::Matrix4d transformation_matrix(const Eigen::Matrix3d &r, const Eigen::Vector3d &p);
     void transform_vector();
+    Eigen::VectorXd screw_axis(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h);
+    Eigen::Matrix3d matrix_exponential(const Eigen::Vector3d &w, double theta);
+    Eigen::Matrix4d matrix_exponential(const Eigen::Vector3d &w, const Eigen::Vector3d &v, double theta);
 }
 
 #endif

@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 #include "math/math.h"
+#include <fstream>
 
 
 using namespace math;
@@ -359,6 +360,7 @@ Eigen::Matrix4d ur3e_fk_transform(const std::vector<double> &joint_positions) {
     t56.block<1, 3>(3, 0) = Eigen::Vector3d::Zero().transpose();
     t56(3, 3) = 1.0;
     Eigen::Matrix4d t67 = Eigen::Matrix4d::Identity();
+    t67.block<3, 3>(0, 0) = math::rotate_x(90.0 * math::deg_to_rad);
     t67.block<3, 1>(0, 3) = Eigen::Vector3d(0.0, -W2, 0.0);
     Eigen::Matrix4d m = Eigen::Matrix4d::Zero();
     m.block<3, 1>(0, 3) = Eigen::Vector3d(-L1 - L2, -W1 - W2, H1 - H2);
@@ -373,31 +375,52 @@ Eigen::Matrix4d ur3e_fk_transform(const std::vector<double> &joint_positions) {
 
 
 
+
 int main()
 {
-    /*Eigen::Vector3d e = Eigen::Vector3d(60.0, 45.0, 30.0) * math::deg_to_rad;
+    Eigen::Vector3d e = Eigen::Vector3d(60.0, 45.0, 30.0) * math::deg_to_rad;
     Eigen::Matrix3d rotation_matrix= math::rotation_matrix_from_euler("zyx", e);
     Eigen::Vector3d ea = euler_zyx_from_rotation(rotation_matrix);
     std::cout << " E:" << e.transpose() * math::rad_to_deg << std::endl;
-    std::cout << "Ea:" << ea.transpose() * math::rad_to_deg << std::endl;*/
-    //task2_a();
-    //task2_b();
-    //print_pose("shit", Eigen::Matrix4d::Identity());
+    std::cout << "Ea:" << ea.transpose() * math::rad_to_deg << std::endl;
+    task2_a();
+    task2_b();
+    print_pose("shit", Eigen::Matrix4d::Identity());
     //task4b-c
-    /*std::vector<double> joint_positions = {10.0, 15.0, 2.75};
+    std::vector<double> joint_positions = {10.0, 15.0, 2.75};
     Eigen::Matrix4d transform = planar_3r_fk_transform(joint_positions);
     Eigen::Matrix4d screw = planar_3r_fk_screw(joint_positions);
     print_pose("end position transform:", transform);
-    print_pose("end position screw", screw);*/
+    print_pose("end position screw", screw);
     //task5a
-    std::vector<double> joint_positions = {30.0, -60.0, 30.0, -50.0, 90.0, 0.0};  //-286, -317, 545
-    //std::vector<double> joint_positions = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};  //-457,  -223,  67
-    //std::vector<double> joint_positions = {0.0, 0.0, 0.0, -90.0, 0.0, 0.0};  //-542, -223, 152
-    //std::vector<double> joint_positions = {0.0, 180.0, 0.0, 0.0, 0.0, 0.0};  //456, -223, 236
-    //std::vector<double> joint_positions = {0.0, -90.0, 0.0, 0.0, 0.0, 0.0};  //-85, -223, 608
-    Eigen::Matrix4d screw_ur3e = ur3e_fk_screw(joint_positions);
-    Eigen::Matrix4d transform_ur3e = ur3e_fk_transform(joint_positions);
+    //std::vector<double> joint_positions = {30.0, -60.0, 30.0, -50.0, 90.0, 0.0};  //-286, -317, 545, & 9.9, 0, -59,8
+    std::vector<double> joint_positions1 = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};  //-457,  -223,  67 & 90, 0, 0
+    //std::vector<double> joint_positions = {0.0, 0.0, 0.0, -90.0, 0.0, 0.0};  //-542, -223, 152 & -1.3, 89.8, -91
+    //std::vector<double> joint_positions = {0.0, 180.0, 0.0, 0.0, 0.0, 0.0};  //456, -223, 236 & -90, 0, 180
+    //std::vector<double> joint_positions = {0.0, 90, 0.0, 0.0, 0.0, 0.0};  //-85, -223, 608 & -178.2, 90, 92
+    //std::vector<double> joint_positions = {0.0, 0.0, 0.0, 0.0, 180.0, 0.0};  //-457, -40, 67 & 90, 0, -180
+    //std::vector<double> joint_positions1 = {0.0, 0.0, 0.0, 90.0, 0.0, 0.0};  //-371, -223, 152 & 2, -90, 88
+    //std::vector<double> joint_positions = {0.0, 0.0, 0.0, 30.0, 0.0, 0.0};  //-414, -223, 79 & 90, -30, 0
+    //std::vector<double> joint_positions = {0.0, 0.0, 0.0, -30.0, 0.0, 0.0};  //-499, -223, 79 & 90, 30, 0
+
+
+    Eigen::Matrix4d screw_ur3e = ur3e_fk_screw(joint_positions1);
+    Eigen::Matrix4d transform_ur3e = ur3e_fk_transform(joint_positions1);
     print_pose("end position screw ur3e:", screw_ur3e);
     print_pose("end position transform ur3e:", transform_ur3e);
+
+
+    /*for (int i = 0; i < 180; ++i) {
+     joint_positions[4] = -90 + i;
+     Eigen::Matrix4d screw_ur3e = ur3e_fk_screw(joint_positions);
+
+     // Extract the 3x3 rotation matrix
+     Eigen::Matrix3d R = screw_ur3e.block<3, 3>(0, 0);
+     Eigen::Vector3d e = euler_zyx_from_rotation(R)*rad_to_deg;
+
+     std::cout << "i = " << i << "      " << e.transpose() << std::endl;
+     //std::cout << e.transpose() << std::endl;
+
+ }*/
     return 0;
 }

@@ -108,3 +108,49 @@ Eigen::Matrix4d math::transformation_matrix(const Eigen::Matrix3d &r, const Eige
     return matrix;
 }
 
+Eigen::VectorXd math::screw_axis(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h)
+// Create a screw axis from a point, a direction and pitch. Modern Robotics page 101.
+{
+    Eigen::VectorXd screw_axis(6);
+    screw_axis << s, - s.cross(q) + h * s;
+    return screw_axis;
+}
+
+Eigen::Matrix3d math::matrix_exponential(const Eigen::Vector3d &w, double theta)
+{
+    Eigen::Matrix3d matrix;
+    double rad = theta * math::deg_to_rad;
+    Eigen::Matrix3d w_sk = math::skew_symmetric(w);
+    matrix = Eigen::Matrix3d::Identity() + w_sk * std::sin(rad) + w_sk * w_sk * (1 - std::cos(rad));
+    return matrix;
+}
+
+Eigen::Matrix4d math::matrix_exponential(const Eigen::Vector3d &w, const Eigen::Vector3d &v, double theta)
+// Creat a matrix from a screw.
+{
+    Eigen::Matrix4d T;
+    double rad = theta * math::deg_to_rad;
+    if (w.norm() == 1)
+    {
+        Eigen::Matrix3d w_sk = math::skew_symmetric(w);
+        Eigen::Matrix3d ewt = math::matrix_exponential(w, theta);
+        Eigen::Matrix3d G = math::I_3() * rad + (1 - std::cos(rad)) * w_sk + (rad - std::sin(rad)) * w_sk * w_sk;
+        T.block<3, 3>(0, 0) = ewt;
+        T.block<3, 1>(0, 3) = G * v;
+        T.block<1, 3>(3, 0) = Eigen::Vector3d::Zero().transpose();
+        T(3, 3) = 1.0;
+    }
+    else if (v.norm() == 1 and w.norm() == 0)
+    {
+        T.block<3, 3>(0, 0) = math::I_3();
+        T.block<3, 1>(0, 3) = v;
+        T.block<1, 3>(3, 0) = Eigen::Vector3d::Zero().transpose();
+        T(3, 3) = 1.0;
+    }
+    else
+    {
+        std::cout << "Invalid input" << std::endl;
+        return Eigen::Matrix4d::Zero();
+    }
+    return T;
+}
