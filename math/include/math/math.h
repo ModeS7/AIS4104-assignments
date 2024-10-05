@@ -23,8 +23,13 @@ namespace math{
     Eigen::Matrix4d transformation_matrix(const Eigen::Matrix3d &r, const Eigen::Vector3d &p);
     void transform_vector();
     Eigen::VectorXd screw_axis(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h);
+    Eigen::VectorXd twist(const Eigen::Vector3d &w, const Eigen::Vector3d &v);
     Eigen::Matrix3d matrix_exponential(const Eigen::Vector3d &w, double theta);
     Eigen::Matrix4d matrix_exponential(const Eigen::Vector3d &w, const Eigen::Vector3d &v, double theta);
+    Eigen::MatrixXd adjoint_matrix(const Eigen::Matrix4d &tf);
+    bool floatEquals(double a, double b);
+    Eigen::Vector3d euler_zyx_from_rotation(const Eigen::Matrix3d &r);
+    void print_pose(const std::string &label, const Eigen::Matrix4d &tf);
 }
 
 #endif

@@ -109,11 +109,22 @@ Eigen::Matrix4d math::transformation_matrix(const Eigen::Matrix3d &r, const Eige
 }
 
 Eigen::VectorXd math::screw_axis(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h)
-// Create a screw axis from a point, a direction and pitch. Modern Robotics page 101.
+// Create a screw axis from a point, a direction and pitch.
+// Where q is any point on the axis, s is a unit vector in the direction of the axis,
+// and h is the pitch of the axis. Modern Robotics page 101.
 {
     Eigen::VectorXd screw_axis(6);
     screw_axis << s, - s.cross(q) + h * s;
     return screw_axis;
+}
+
+Eigen::VectorXd math::twist(const Eigen::Vector3d &w, const Eigen::Vector3d &v)
+// Create a twist from two vectors: angular velocity w and linear velocity v.
+// Modern Robotics page 96.
+{
+    Eigen::VectorXd twist(6);
+    twist << w, v;
+    return twist;
 }
 
 Eigen::Matrix3d math::matrix_exponential(const Eigen::Vector3d &w, double theta)
@@ -154,3 +165,92 @@ Eigen::Matrix4d math::matrix_exponential(const Eigen::Vector3d &w, const Eigen::
     }
     return T;
 }
+
+Eigen::MatrixXd math::adjoint_matrix(const Eigen::Matrix4d &tf)
+// Create the adjoint matrix from a transformation matrix.
+{
+    Eigen::Matrix3d R = tf.block<3,3>(0,0);
+    Eigen::Vector3d p = tf.block<3,1>(0,3);
+    Eigen::MatrixXd adjoint_matrix(6,6);
+    adjoint_matrix << R, Eigen::Matrix3d::Zero(),
+            math::skew_symmetric(p) * R, R;
+    return adjoint_matrix;
+}
+
+bool math::floatEquals(double a, double b)
+{
+    return std::abs(a - b) < 1e-6;
+}
+
+Eigen::Vector3d math::euler_zyx_from_rotation(const Eigen::Matrix3d &r)
+{
+    double a = 0.0;
+    double b = 0.0;
+    double c = 0.0;
+
+    if(math::floatEquals(r(2,0), -1.0))
+    {
+        b = EIGEN_PI / 2.0;
+        a = 0.0;
+        c = std::atan2(r(0,1), r(1,1));
+    }
+    else if(math::floatEquals(r(2,0), 1.0))
+    {
+        b = -(EIGEN_PI / 2.0);
+        a = 0.0;
+        c = -std::atan2(r(0,1), r(1,1));
+    }
+    else
+    {
+        b = std::atan2(-r(2,0), std::sqrt(r(0,0) * r(0,0) + r(1,0) * r(1,0)));
+        a = std::atan2(r(1,0), r(0,0));
+        c = std::atan2(r(2,1), r(2,2));
+    }
+    return Eigen::Vector3d(a, b, c);
+}
+
+void math::print_pose(const std::string &label, const Eigen::Matrix4d &tf)
+{
+    Eigen::Vector3d p = tf.block<3, 1>(0, 3);
+    Eigen::Matrix3d r = tf.block<3, 3>(0, 0);
+    Eigen::Vector3d e = math::euler_zyx_from_rotation(r);
+    std::cout << label << std::endl;
+    //std::cout << "Euler ZYX(rad): " << e.transpose() << std::endl;
+    std::cout << "Euler ZYX(deg): " << e.transpose() * math::rad_to_deg << std::endl;
+    std::cout << "Position: " << p.transpose() << std::endl;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
