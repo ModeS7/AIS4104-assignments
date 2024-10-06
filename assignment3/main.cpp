@@ -178,40 +178,30 @@ std::pair<uint32_t, double> newton_raphson_root_find(const std::function<double(
 
 // b)
 std::pair<uint32_t, double> gradient_descent_root_find(const std::function<double(double)> &f,
-                                                       double x_0, double gamma = 0.001, double dx_0 = 0.5, double eps = 1e-7)
+                                                       double x_0, double gamma = 0.1, double dx_0 = 0.5, double eps = 1e-7)
 {
-    std::vector<double> x = {x_0};
-    std::vector<double> error = {std::abs(f(x_0))};
+    double x_old = x_0;
+    double x = (x_0 - gamma * ((f(x_0 + dx_0) - f(x_0)) / dx_0));
+    double error_new = {std::abs(f(x))};
+    double error = {std::abs(f(x_old))};
+    double x_new;
+    int iterations = 1;
 
-    double dx = dx_0;
-    int iterations = 0;
-
-    // Calculate initial update using numerical gradient
-    x.push_back(x[0] - gamma * ((f(x[0] + dx) - f(x[0])) / dx));
-    error.push_back(std::abs(f(x[1])));
-
-    std::cout << "Iteration " << iterations << ": x = " << x[0] << ", error = " << error[0] << std::endl;
-    iterations++;
-
-    // Gradient Descent Loop
-    while (error[iterations] > eps && iterations < 100000)
-    {
-        double gradient = (error[iterations] - error[iterations - 1]) / (x[iterations] - x[iterations - 1]);
-
-        // Update x using gradient descent formula
-        x.push_back(x[iterations] - gamma * gradient);
-        error.push_back(std::abs(f(x[iterations + 1])));
-
+    while (error_new > eps){
+        x_new = (x - gamma * (error_new - error) / (x - x_old));
+        error = error_new;
+        error_new = (std::abs(f(x_new)));
+        x_old = x;
+        x = x_new;
         iterations++;
-    }
 
-    if (iterations >= 10000) {
-        std::cout << "Reached maximum iterations: " << iterations << std::endl;
-    } else {
-        std::cout << "Converged after " << iterations << " iterations: x = " << x[iterations] << ", error = " << error[iterations] << std::endl;
+        if (iterations >= 100000) {
+            std::cout << "Reached maximum iterations: " << iterations << std::endl;
+            break;
+        }
     }
+    return std::make_pair(iterations, x);
 
-    return std::make_pair(iterations, x[iterations]);
 }
 
 // c)
@@ -241,15 +231,54 @@ void test_root_find()
 Eigen::MatrixXd ur3e_space_jacobian(const Eigen::VectorXd &current_joint_positions)
 {
     auto [m, space_screws] = ur3e_space_chain();
-    Eigen::MatrixXd jacobian(6, current_joint_positions.size());
-    Eigen::Matrix4d t = Eigen::Matrix4d::Identity();
-    for (int i = 0; i < current_joint_positions.size(); i++)
-    {
-        t *= matrix_exponential(space_screws[i], current_joint_positions[i]);
-        jacobian.block<3, 1>(0, i) = t.block<3, 1>(0, 2);
-        jacobian.block<3, 1>(3, i) = space_screws[i].head(3);
+    Eigen::MatrixXd jacobian(6, space_screws.size());
+    int n_c = current_joint_positions.size();
+    int n_s = space_screws.size();
+    if (n_c != n_s){
+        std::cerr << "Invalid number of joint positions" << std::endl;
+        jacobian = Eigen::MatrixXd::Zero(6, n_s);
     }
-    return jacobian;
+    else{
+        Eigen::Matrix4d t = Eigen::Matrix4d::Identity();
+        for (int i = 0; i < n_s; i++)
+        {
+            if (i == 0){
+                jacobian.block<6, 1>(0, i) = space_screws[i];
+                continue;
+            }
+            else{
+                Eigen::MatrixXd adj;
+                t *= matrix_exponential(space_screws[i-1], current_joint_positions[i-1]);
+                adj = math::adjoint_matrix(t);
+                jacobian.block<6, 1>(0, i) = adj * space_screws[i];
+            }
+        }
+        return jacobian;
+    }
+}
+
+// b)
+Eigen::MatrixXd ur3e_body_jacobian(const Eigen::VectorXd &current_joint_positions)
+{
+    auto [m, body_twists] = ur3e_body_chain();
+    Eigen::MatrixXd jacobian(6, body_twists.size());
+    int n_c = current_joint_positions.size();
+    int n_s = body_twists.size();
+    if (n_c != n_s){
+        std::cerr << "Invalid number of joint positions" << std::endl;
+        jacobian = Eigen::MatrixXd::Zero(6, n_s);
+    }
+    else{
+        Eigen::Matrix4d t = Eigen::Matrix4d::Identity();
+        for (int i = 0; i < n_s; i++)
+        {
+            Eigen::MatrixXd adj;
+            t *= matrix_exponential(body_twists[i], current_joint_positions[i]);
+            adj = math::adjoint_matrix(t);
+            jacobian.block<6, 1>(0, i) = adj * body_twists[i];
+        }
+        return jacobian;
+    }
 }
 
 
