@@ -270,16 +270,54 @@ Eigen::MatrixXd ur3e_body_jacobian(const Eigen::VectorXd &current_joint_position
     }
     else{
         Eigen::Matrix4d t = Eigen::Matrix4d::Identity();
-        for (int i = 0; i < n_s; i++)
+        for (int i = n_s; i > 0; i--)
         {
-            Eigen::MatrixXd adj;
-            t *= matrix_exponential(body_twists[i], current_joint_positions[i]);
-            adj = math::adjoint_matrix(t);
-            jacobian.block<6, 1>(0, i) = adj * body_twists[i];
+            if (i == n_s){
+                jacobian.block<6, 1>(0, i-1) = body_twists[i-1];
+                continue;
+            }
+            else{
+                Eigen::MatrixXd adj;
+                Eigen::VectorXd b_t = -body_twists[i];
+                t *= matrix_exponential(b_t, current_joint_positions[i]);
+                adj = math::adjoint_matrix(t);
+                jacobian.block<6, 1>(0, i-1) = adj * body_twists[i-1];
+            }
         }
         return jacobian;
     }
 }
+
+// c)
+void ur3e_test_jacobian(const Eigen::VectorXd &joint_positions)
+{
+    Eigen::Matrix4d tsb = ur3e_body_fk(joint_positions);
+    auto [m, space_screws] = ur3e_space_chain();
+    Eigen::MatrixXd jb = ur3e_body_jacobian(joint_positions);
+    Eigen::MatrixXd js = ur3e_space_jacobian(joint_positions);
+    Eigen::MatrixXd ad_tsb = adjoint_matrix(tsb);
+    Eigen::MatrixXd ad_tbs = adjoint_matrix(tsb.inverse());
+    std::cout << "Jb: " << std::endl << jb << std::endl << "Ad_tbs*Js:" << std::endl << ad_tbs * js << std::endl << std::endl;
+    std::cout << "Js: " << std::endl << js << std::endl << "Ad_tsb*Jb:" << std::endl << ad_tsb * jb << std::endl << std::endl;
+    std::cout << "d Jb: " << std::endl << jb - ad_tbs * js << std::endl << std::endl;
+    std::cout << "d Js: " << std::endl << js - ad_tsb * jb << std::endl << std::endl;
+}
+void ur3e_test_jacobian()
+{
+    std::cout << "Jacobian matrix tests" << std::endl;
+    ur3e_test_jacobian(std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}));
+    ur3e_test_jacobian(std_vector_to_eigen(std::vector<double>{45.0, -20.0, 10.0, 2.5, 30.0, -50.0}));
+}
+
+// Task 4
+// a)
+std::pair<size_t, Eigen::VectorXd> ur3e_ik_body(const Eigen::Matrix4d &t_sd,
+                                                const Eigen::VectorXd &current_joint_positions,
+                                                double gamma = 1e-2, double v_e = 4e-3, double w_e = 4e-3)
+{
+
+}
+
 
 
 
@@ -288,7 +326,9 @@ int main()
     // Task 1
     //ur3e_test_fk();
     // Task 2
-    test_root_find();
+    //test_root_find();
+    // Task 3
+    ur3e_test_jacobian();
     return 0;
 }
 
