@@ -30,6 +30,9 @@ namespace math{
     bool floatEquals(double a, double b);
     Eigen::Vector3d euler_zyx_from_rotation(const Eigen::Matrix3d &r);
     void print_pose(const std::string &label, const Eigen::Matrix4d &tf);
+    double cot(double radians);
+    std::pair<Eigen::Vector3d, double> matrix_logarithm(const Eigen::Matrix3d &r);
+    std::pair<Eigen::VectorXd, double> matrix_logarithm(const Eigen::Matrix4d &t);
 }
 
 #endif
