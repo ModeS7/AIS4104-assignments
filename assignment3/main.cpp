@@ -3,7 +3,7 @@
 #include <Eigen/Dense>
 #include "math/math.h"
 #include <fstream>
-
+#include <chrono>
 
 using namespace math;
 
@@ -364,7 +364,7 @@ std::pair<size_t, Eigen::VectorXd> ur3e_ik_body(const Eigen::Matrix4d &t_sd,
 void ur3e_ik_test_pose(const Eigen::Vector3d &pos, const Eigen::Vector3d &zyx, const Eigen::VectorXd &j0)
 {
 std::cout << "Test from pose" << std::endl;
-Eigen::Matrix4d t_sd = transformation_matrix(rotation_matrix_from_euler("zyx", zyx), pos);
+Eigen::Matrix4d t_sd = transformation_matrix(rotation_matrix_from_euler(ZYX, zyx), pos);
 auto [iterations, j_ik] = ur3e_ik_body(t_sd, j0);
 Eigen::Matrix4d t_ik = ur3e_body_fk(j_ik);
 print_pose(" IK pose",t_ik);
