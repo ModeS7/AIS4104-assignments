@@ -134,24 +134,24 @@ void ur3e_test_fk()
 {
     std::cout << "Forward kinematics tests" << std::endl;
     math::print_pose("pos1_s", ur3e_space_fk(std_vector_to_eigen(
-            std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0})));
+            std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) * math::deg_to_rad));
     math::print_pose("pos1_b", ur3e_body_fk(std_vector_to_eigen(
-            std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0})));
+            std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) * math::deg_to_rad));
     std::cout << std::endl;
     math::print_pose("pos2_s", ur3e_space_fk(std_vector_to_eigen(
-            std::vector<double>{0.0, 0.0, 0.0, -90.0, 0.0, 0.0})));
+            std::vector<double>{0.0, 0.0, 0.0, -90.0, 0.0, 0.0}) * math::deg_to_rad));
     math::print_pose("pos2_b", ur3e_body_fk(std_vector_to_eigen(
-            std::vector<double>{0.0, 0.0, 0.0, -90.0, 0.0, 0.0})));
+            std::vector<double>{0.0, 0.0, 0.0, -90.0, 0.0, 0.0}) * math::deg_to_rad));
     std::cout << std::endl;
     math::print_pose("pos3_s", ur3e_space_fk(std_vector_to_eigen(
-            std::vector<double>{0.0, 0.0, -180.0, 0.0, 0.0, 0.0})));
+            std::vector<double>{0.0, 0.0, -180.0, 0.0, 0.0, 0.0}) * math::deg_to_rad));
     math::print_pose("pos3_b", ur3e_body_fk(std_vector_to_eigen(
-            std::vector<double>{0.0, 0.0, -180.0, 0.0, 0.0, 0.0})));
+            std::vector<double>{0.0, 0.0, -180.0, 0.0, 0.0, 0.0}) * math::deg_to_rad));
     std::cout << std::endl;
     math::print_pose("pos4_s", ur3e_space_fk(std_vector_to_eigen(
-            std::vector<double>{0.0, 0.0, -90.0, 0.0, 0.0, 0.0})));
+            std::vector<double>{0.0, 0.0, -90.0, 0.0, 0.0, 0.0}) * math::deg_to_rad));
     math::print_pose("pos4_b", ur3e_body_fk(std_vector_to_eigen(
-            std::vector<double>{0.0, 0.0, -90.0, 0.0, 0.0, 0.0})));
+            std::vector<double>{0.0, 0.0, -90.0, 0.0, 0.0, 0.0}) * math::deg_to_rad));
 }
 
 // Task 2
@@ -320,15 +320,15 @@ void ur3e_test_jacobian(const Eigen::VectorXd &joint_positions)
 void ur3e_test_jacobian()
 {
     std::cout << "Jacobian matrix tests" << std::endl;
-    ur3e_test_jacobian(std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}));
-    ur3e_test_jacobian(std_vector_to_eigen(std::vector<double>{45.0, -20.0, 10.0, 2.5, 30.0, -50.0}));
+    ur3e_test_jacobian(std_vector_to_eigen(std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}) * math::deg_to_rad);
+    ur3e_test_jacobian(std_vector_to_eigen(std::vector<double>{45.0, -20.0, 10.0, 2.5, 30.0, -50.0}) * math::deg_to_rad);
 }
 
 // Task 4
 // a)
 std::pair<size_t, Eigen::VectorXd> ur3e_ik_body(const Eigen::Matrix4d &t_sd,
                                                 const Eigen::VectorXd &current_joint_positions,
-                                                double gamma = 1e-2,
+                                                double gamma = 1,
                                                 double v_e = 4e-3,
                                                 double w_e = 4e-3)
 // Compute the joint positions of the UR3e robot
