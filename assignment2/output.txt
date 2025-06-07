@@ -1,0 +1,29 @@
+ E:60 45 30
+Ea:60 45 30
+f_w: -30   0   0
+t_w: 1.73205       0       1
+f_s:     -7.5 -12.9904 -25.9808
+m_s: 0 0 2
+F_f:     0     0 -0.75     0    -6     0
+shit
+Euler ZYX(rad):  0 -0  0
+Euler ZYX(deg):  0 -0  0
+Position: 0 0 0
+end position transform:
+Euler ZYX(rad): 0.484329       -0        0
+Euler ZYX(deg): 27.75    -0     0
+Position:  27.761 10.6188       0
+end position screw
+Euler ZYX(rad): 0.484329       -0        0
+Euler ZYX(deg): 27.75    -0     0
+Position:  27.761 10.6188       0
+end position screw ur3e:
+Euler ZYX(rad):       0 -1.5708  1.5708
+Euler ZYX(deg):   0 -90  90
+Position: -371.4 -223.2  151.9
+end position transform ur3e:
+Euler ZYX(rad):       0 -1.5708  1.5708
+Euler ZYX(deg):   0 -90  90
+Position: -371.4 -223.2  151.9
+
+Process finished with exit code 0

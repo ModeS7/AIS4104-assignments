@@ -294,7 +294,7 @@ Eigen::MatrixXd ur3e_body_jacobian(const Eigen::VectorXd &current_joint_position
     while (i+1 > 0)
     {
         Eigen::VectorXd b_t = -body_twists[i+1];
-        t *= matrix_exponential(b_t.head(3), b_t.tail(3), current_joint_positions[i+1]);
+        t *= math::matrix_exponential(b_t.head(3), b_t.tail(3), current_joint_positions[i+1]);
         adj = math::adjoint_matrix(t);
         jacobian.block<6, 1>(0, i) = adj * body_twists[i];
         i--;

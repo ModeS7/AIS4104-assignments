@@ -28,7 +28,7 @@ int main()
 
 Eigen::Matrix3d math::skew_symmetric(Eigen::Vector3d v)
 {
-    // Turn 3d vector into skew symmetric matrix. Modern Robotics page 75.
+    // Turn 3d vector into skew symmetric matrix. Modern Robotics(December 30, 2019) page 75.
     Eigen::Matrix3d skew_matrix;
     skew_matrix <<
     0.0, -v(2), v(1),
@@ -39,7 +39,7 @@ Eigen::Matrix3d math::skew_symmetric(Eigen::Vector3d v)
 
 Eigen::Vector3d math::skew_symmetric_to_vector(const Eigen::Matrix3d &m)
 {
-    // Turn skew symmetric matrix back to 3d vector. Modern Robotics page 75.
+    // Turn skew symmetric matrix back to 3d vector. Modern Robotics(December 30, 2019) page 75.
     Eigen::Vector3d v;
     v << m(2, 1), m(0, 2), m(1, 0);
     return v;
@@ -59,7 +59,7 @@ Eigen::Matrix3d rotation_matrix_from_frame_axes(const Eigen::Vector3d &x,
 
 Eigen::Matrix3d math::rotate_x(double radians)
 {
-    // Create a 3x3 rotation matrix around x-axis. Modern Robotics page 72.
+    // Create a 3x3 rotation matrix around x-axis. Modern Robotics(December 30, 2019) page 72.
     double c = std::cos(radians);
     double s = std::sin(radians);
     Eigen::Matrix3d matrix;
@@ -72,7 +72,7 @@ Eigen::Matrix3d math::rotate_x(double radians)
 
 Eigen::Matrix3d math::rotate_y(double radians)
 {
-    // Create a 3x3 rotation matrix around y-axis. Modern Robotics page 72.
+    // Create a 3x3 rotation matrix around y-axis. Modern Robotics(December 30, 2019) page 72.
     double c = std::cos(radians);
     double s = std::sin(radians);
 
@@ -86,7 +86,7 @@ Eigen::Matrix3d math::rotate_y(double radians)
 
 Eigen::Matrix3d math::rotate_z(double radians)
 {
-    // Create a 3x3 rotation matrix around z-axis. Modern Robotics page 72.
+    // Create a 3x3 rotation matrix around z-axis. Modern Robotics(December 30, 2019) page 72.
     double c = std::cos(radians);
     double s = std::sin(radians);
 
@@ -100,7 +100,7 @@ Eigen::Matrix3d math::rotate_z(double radians)
 
 Eigen::Matrix3d math::rotation_matrix_from_axis_angle(const Eigen::Vector3d &axis, double radians)
 {
-    // Create a 3x3 rotation matrix from an axis and an angle. Modern Robotics page 72.
+    // Create a 3x3 rotation matrix from an axis and an angle. Modern Robotics(December 30, 2019) page 72.
     double c = std::cos(radians);
     double s = std::sin(radians);
 
@@ -114,7 +114,7 @@ Eigen::Matrix3d math::rotation_matrix_from_axis_angle(const Eigen::Vector3d &axi
 Eigen::Matrix3d math::rotation_matrix_from_euler(euler r, const Eigen::Vector3d &radians)
 {
     // Create a 3x3 rotation matrix from euler angles
-    // and given sequence. Modern Robotics page 577.
+    // and given sequence. Modern Robotics(December 30, 2019) page 577.
     Eigen::Matrix3d matrix;
     switch (r) {
         case ZYX:
@@ -159,7 +159,7 @@ Eigen::Matrix4d math::transformation_matrix(const Eigen::Matrix3d &r, const Eige
 {
     // Create a 4x4 homogeneous transformation matrix
     // from a rotation matrix and a position vector.
-    // Modern Robotics page 87.
+    // Modern Robotics(December 30, 2019) page 87.
     Eigen::Matrix4d matrix;
     matrix <<
     r(0, 0), r(0, 1), r(0, 2), p(0),
@@ -172,7 +172,7 @@ Eigen::Matrix4d math::transformation_matrix(const Eigen::Matrix3d &r, const Eige
 Eigen::VectorXd math::screw_axis(const Eigen::Vector3d &q, const Eigen::Vector3d &s, double h)
 // Create a screw axis from a point, a direction and pitch.
 // Where q is any point on the axis, s is a unit vector in the direction of the axis,
-// and h is the pitch of the axis. Modern Robotics page 101.
+// and h is the pitch of the axis. Modern Robotics(December 30, 2019) page 101.
 {
     Eigen::VectorXd screw_axis(6);
     screw_axis << s, - s.cross(q) + h * s;
@@ -181,7 +181,7 @@ Eigen::VectorXd math::screw_axis(const Eigen::Vector3d &q, const Eigen::Vector3d
 
 Eigen::VectorXd math::twist(const Eigen::Vector3d &w, const Eigen::Vector3d &v)
 // Create a twist from two vectors: angular velocity w and linear velocity v.
-// Modern Robotics page 96.
+// Modern Robotics(December 30, 2019) page 96.
 {
     Eigen::VectorXd twist(6);
     twist << w, v;
@@ -191,7 +191,7 @@ Eigen::VectorXd math::twist(const Eigen::Vector3d &w, const Eigen::Vector3d &v)
 Eigen::Matrix3d math::matrix_exponential(const Eigen::Vector3d &w, double theta)
 // Rodrigues' formula for matrix exponential.
 // Creates a rotation matrix from rotation axis
-// w_hat and angle theta. Modern Robotics page 82.
+// w_hat and angle theta. Modern Robotics(December 30, 2019) page 82.
 {
     Eigen::Matrix3d w_sk = math::skew_symmetric(w);
     return (Eigen::Matrix3d::Identity() + w_sk * std::sin(theta) + w_sk * w_sk * (1.0 - std::cos(theta)));
@@ -199,7 +199,7 @@ Eigen::Matrix3d math::matrix_exponential(const Eigen::Vector3d &w, double theta)
 
 Eigen::Matrix4d math::matrix_exponential(const Eigen::Vector3d &w, const Eigen::Vector3d &v, double theta)
 // Creat a homogeneous transformation from skew axis
-// components(w and v) and theta angle. Modern Robotics page 103.
+// components(w and v) and theta angle. Modern Robotics(December 30, 2019) page 103.
 {
     Eigen::Matrix4d T;
 
@@ -240,7 +240,7 @@ Eigen::Matrix4d math::matrix_exponential(const Eigen::Vector3d &w, const Eigen::
 
 Eigen::MatrixXd math::adjoint_matrix(const Eigen::Matrix4d &tf)
 // Create the adjoint representation 6x6 matrix from
-// a transformation matrix. Modern Robotics page 98.
+// a transformation matrix. Modern Robotics(December 30, 2019) page 98.
 {
     Eigen::Matrix3d R = tf.block<3,3>(0,0);
     Eigen::Vector3d p = tf.block<3,1>(0,3);
@@ -262,7 +262,7 @@ bool math::floatEquals(double a, double b)
 
 Eigen::Vector3d math::euler_zyx_from_rotation(const Eigen::Matrix3d &r)
 // Extract euler angles from a rotation matrix.
-// Modern Robotics page 579.
+// Modern Robotics(December 30, 2019) page 579.
 {
     double a = 0.0;
     double b = 0.0;
@@ -309,7 +309,7 @@ double math::cot(double radians)
 
 std::pair<Eigen::Vector3d, double> math::matrix_logarithm(const Eigen::Matrix3d &r)
 // Compute the matrix logarithm of a rotation matrix.
-// Modern Robotics page 85-86.
+// Modern Robotics(December 30, 2019) page 85-86.
 {
     Eigen::Matrix3d w_sk;
     double rad;
@@ -346,7 +346,7 @@ std::pair<Eigen::Vector3d, double> math::matrix_logarithm(const Eigen::Matrix3d 
 
 std::pair<Eigen::VectorXd, double> math::matrix_logarithm(const Eigen::Matrix4d &t)
 // Compute the matrix logarithm of a transformation matrix.
-// Modern Robotics page 104.
+// Modern Robotics(December 30, 2019) page 104.
 {
     Eigen::Matrix3d R = t.block<3, 3>(0, 0);
     Eigen::Vector3d p = t.block<3, 1>(0, 3);

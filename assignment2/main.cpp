@@ -10,11 +10,8 @@ using namespace math;
 
 // Task 1
 // a)
-bool floatEquals(double a, double b)
-{
-    return std::abs(a - b) < 1e-6;
-}
 
+/*
 Eigen::Vector3d euler_zyx_from_rotation(const Eigen::Matrix3d &r)
 {
     double a = 0.0;
@@ -143,7 +140,7 @@ std::pair<Eigen::Vector3d, double> matrix_logarithm(const Eigen::Matrix3d &r)
     {
         theta = std::acos((r.trace() - 1) / 2);
         w_sk = r - r.transpose() / (2 * std::sin(theta * math::rad_to_deg));
-        w = math::skew_symetric_to_vector(w_sk);
+        w = math::skew_symmetric_to_vector(w_sk);
     }
     return std::make_pair(w, theta);
 }
@@ -219,7 +216,7 @@ void print_pose(const std::string &label, const Eigen::Matrix4d &tf)
     std::cout << "Euler ZYX(deg): " << e.transpose() * math::rad_to_deg << std::endl;
     std::cout << "Position: " << p.transpose() << std::endl;
 }
-
+*/
 // b)
 Eigen::Matrix4d planar_3r_fk_transform(const std::vector<double> &joint_positions)
 {
@@ -250,13 +247,13 @@ Eigen::Matrix4d planar_3r_fk_screw(const std::vector<double> &joint_positions)
     double L1 = 10.0, L2 = 10.0, L3 = 10.0;
     Eigen::Vector3d w1 = Eigen::Vector3d(0.0, 0.0, 1.0);
     Eigen::Vector3d v1 = Eigen::Vector3d(0.0, 0.0, 0.0);
-    Eigen::Matrix4d e1 = matrix_exponential(w1, v1, joint_positions[0]);
+    Eigen::Matrix4d e1 = math::matrix_exponential(w1, v1, joint_positions[0]);
     Eigen::Vector3d w2 = Eigen::Vector3d(0.0, 0.0, 1.0);
     Eigen::Vector3d v2 = Eigen::Vector3d(0.0, -L1, 0.0);
-    Eigen::Matrix4d e2 = matrix_exponential(w2, v2, joint_positions[1]);
+    Eigen::Matrix4d e2 = math::matrix_exponential(w2, v2, joint_positions[1]);
     Eigen::Vector3d w3 = Eigen::Vector3d(0.0, 0.0, 1.0);
     Eigen::Vector3d v3 = Eigen::Vector3d(0.0, -(L1+L2), 0.0);
-    Eigen::Matrix4d e3 = matrix_exponential(w3, v3, joint_positions[2]);
+    Eigen::Matrix4d e3 = math::matrix_exponential(w3, v3, joint_positions[2]);
     Eigen::Matrix4d m = Eigen::Matrix4d::Identity();
     m.block<3, 1>(0, 3) = Eigen::Vector3d(L1+L2+L3, 0.0, 0.0);
     return e1 * e2 * e3 * m;
@@ -300,22 +297,22 @@ Eigen::Matrix4d ur3e_fk_screw(const std::vector<double> &joint_positions)  //UR3
     double L1 = 243.6, L2 = 213.2, H1 = 151.9, H2 = 85.4, W1 = 131.1, W2 = 92.1;
     Eigen::Vector3d w1 = Eigen::Vector3d(0.0, 0.0, 1.0);
     Eigen::Vector3d v1 = Eigen::Vector3d(0.0, 0.0, 0.0);
-    Eigen::Matrix4d e1 = matrix_exponential(w1, v1, joint_positions[0]);
+    Eigen::Matrix4d e1 = math::matrix_exponential(w1, v1, joint_positions[0]);
     Eigen::Vector3d w2 = Eigen::Vector3d(0.0, -1.0, 0.0);
     Eigen::Vector3d v2 = Eigen::Vector3d(H1, 0.0, 0.0);
-    Eigen::Matrix4d e2 = matrix_exponential(w2, v2, joint_positions[1]);
+    Eigen::Matrix4d e2 = math::matrix_exponential(w2, v2, joint_positions[1]);
     Eigen::Vector3d w3 = Eigen::Vector3d(0.0, -1.0, 0.0);
     Eigen::Vector3d v3 = Eigen::Vector3d(H1, 0.0, L1);
-    Eigen::Matrix4d e3 = matrix_exponential(w3, v3, joint_positions[2]);
+    Eigen::Matrix4d e3 = math::matrix_exponential(w3, v3, joint_positions[2]);
     Eigen::Vector3d w4 = Eigen::Vector3d(0.0, -1.0, 0.0);
     Eigen::Vector3d v4 = Eigen::Vector3d(H1, 0.0, L1+L2);
-    Eigen::Matrix4d e4 = matrix_exponential(w4, v4, joint_positions[3]);
+    Eigen::Matrix4d e4 = math::matrix_exponential(w4, v4, joint_positions[3]);
     Eigen::Vector3d w5 = Eigen::Vector3d(0.0, 0.0, -1.0);
     Eigen::Vector3d v5 = Eigen::Vector3d(W1, -L1-L2, 0.0);
-    Eigen::Matrix4d e5 = matrix_exponential(w5, v5, joint_positions[4]);
+    Eigen::Matrix4d e5 = math::matrix_exponential(w5, v5, joint_positions[4]);
     Eigen::Vector3d w6 = Eigen::Vector3d(0.0, -1.0, 0.0);
     Eigen::Vector3d v6 = Eigen::Vector3d(H1-H2, 0.0, L1+L2);
-    Eigen::Matrix4d e6 = matrix_exponential(w6, v6, joint_positions[5]);
+    Eigen::Matrix4d e6 = math::matrix_exponential(w6, v6, joint_positions[5]);
     Eigen::Matrix4d m = Eigen::Matrix4d::Zero();
     m.block<3, 1>(0, 3) = Eigen::Vector3d(-L1-L2, -W1-W2, H1-H2);
     m.block<3, 3>(0, 0) <<  1.0, 0.0, 0.0,
@@ -378,7 +375,7 @@ Eigen::Matrix4d ur3e_fk_transform(const std::vector<double> &joint_positions) {
 
 int main()
 {
-    Eigen::Vector3d e = Eigen::Vector3d(60.0, 45.0, 30.0) * math::deg_to_rad;
+    /*Eigen::Vector3d e = Eigen::Vector3d(60.0, 45.0, 30.0) * math::deg_to_rad;
     Eigen::Matrix3d rotation_matrix= math::rotation_matrix_from_euler("zyx", e);
     Eigen::Vector3d ea = euler_zyx_from_rotation(rotation_matrix);
     std::cout << " E:" << e.transpose() * math::rad_to_deg << std::endl;
@@ -386,12 +383,13 @@ int main()
     task2_a();
     task2_b();
     print_pose("shit", Eigen::Matrix4d::Identity());
+     */
     //task4b-c
-    std::vector<double> joint_positions = {10.0, 15.0, 2.75};
+    std::vector<double> joint_positions = {10.0, -15.0, 2.75};
     Eigen::Matrix4d transform = planar_3r_fk_transform(joint_positions);
     Eigen::Matrix4d screw = planar_3r_fk_screw(joint_positions);
-    print_pose("end position transform:", transform);
-    print_pose("end position screw", screw);
+    math::print_pose("end position transform:", transform);
+    math::print_pose("end position screw", screw);
     //task5a
     //std::vector<double> joint_positions = {30.0, -60.0, 30.0, -50.0, 90.0, 0.0};  //-286, -317, 545, & 9.9, 0, -59,8
     std::vector<double> joint_positions1 = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};  //-457,  -223,  67 & 90, 0, 0
@@ -406,8 +404,8 @@ int main()
 
     Eigen::Matrix4d screw_ur3e = ur3e_fk_screw(joint_positions1);
     Eigen::Matrix4d transform_ur3e = ur3e_fk_transform(joint_positions1);
-    print_pose("end position screw ur3e:", screw_ur3e);
-    print_pose("end position transform ur3e:", transform_ur3e);
+    math::print_pose("end position screw ur3e:", screw_ur3e);
+    math::print_pose("end position transform ur3e:", transform_ur3e);
 
 
     /*for (int i = 0; i < 180; ++i) {
